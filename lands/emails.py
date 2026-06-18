@@ -41,8 +41,8 @@ LandMarket Team
     try:
         send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [vendor_user.email])
     except:
-        passfrom django.core.mail import send_mail
-from django.conf import settings
+        from django.core.mail import send_mail
+        from django.conf import settings
 
 
 def send_welcome_email(user, user_type):
