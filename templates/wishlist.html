@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block title %}My Wishlist – LandMarket{% endblock %}
+{% block content %}
+<div class="list-container">
+  <h2>❤️ My Saved Listings</h2>
+  <div class="listings-grid" style="margin-top:28px">
+    {% for item in items %}
+    <div class="land-card">
+      {% if item.land.photos.first %}
+        <img src="{{ item.land.photos.first.image.url }}" alt="{{ item.land.title }}">
+      {% else %}
+        <div class="no-img"><i class="fas fa-image"></i></div>
+      {% endif %}
+      <div class="card-body">
+        <h3>{{ item.land.title }}</h3>
+        <p class="location">📍 {{ item.land.city }}, {{ item.land.state }}</p>
+        <p class="price">₹{{ item.land.price|floatformat:"0" }}</p>
+        <a href="{% url 'land_detail' item.land.pk %}" class="btn-primary">View Details</a>
+        <form method="post" action="{% url 'toggle_wishlist' item.land.pk %}" style="display:inline">
+          {% csrf_token %}
+          <button type="submit" class="btn-secondary" style="margin-top:8px">Remove ✕</button>
+        </form>
+      </div>
+    </div>
+    {% empty %}
+    <div class="empty-state">
+      <p>No saved listings yet. <a href="{% url 'land_list' %}">Browse listings</a> and click Save!</p>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block title %}Browse Land Listings – LandMarket{% endblock %}
+{% block content %}
+<div class="list-container">
+  <div class="list-header">
+    <h2>Browse Land Listings</h2>
+    
+    <form method="get" class="search-bar">
+  <input type="text" name="q" value="{{ query }}" placeholder="Search city, state, title...">
+  <select name="type">
+    <option value="">All Types</option>
+    {% for value, label in type_choices %}
+      <option value="{{ value }}" {% if land_type == value %}selected{% endif %}>{{ label }}</option>
+    {% endfor %}
+  </select>
+
+  <!-- NEW PRICE INPUTS -->
+  <input type="number" name="min_price" value="{{ min_price }}" placeholder="Min Price ₹" style="width:130px">
+  <input type="number" name="max_price" value="{{ max_price }}" placeholder="Max Price ₹" style="width:130px">
+
+  <button type="submit" class="btn-primary">🔍 Search</button>
+  <a href="{% url 'land_list' %}" class="btn-secondary">Clear</a>
+</form>
+
+  <div class="listings-grid">
+    {% for land in listings %}
+    <div class="land-card">
+      {% if land.photos.first %}
+        <img src="{{ land.photos.first.image.url }}" alt="{{ land.title }}">
+      {% else %}
+        <div class="no-img"><i class="fas fa-image"></i></div>
+      {% endif %}
+      <div class="card-body">
+        <span class="badge badge-{{ land.land_type }}">{{ land.get_land_type_display }}</span>
+        <h3>{{ land.title }}</h3>
+        <p class="location"><i class="fas fa-map-marker-alt"></i> {{ land.city }}, {{ land.state }}</p>
+        <p class="price">₹{{ land.price|floatformat:"0" }}</p>
+        <p class="area">{{ land.area_sqft }} sq.ft</p>
+        <p class="seller"><i class="fas fa-user"></i> {{ land.vendor.get_full_name|default:land.vendor.username }}</p>
+        <a href="{% url 'land_detail' land.pk %}" class="btn-primary">View Details</a>
+      </div>
+    </div>
+    {% empty %}
+    <div class="empty-state">
+      <i class="fas fa-search"></i>
+      <p>No listings found. Try a different search.</p>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

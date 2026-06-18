@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% block title %}Add Land Listing – LandMarket{% endblock %}
+{% block content %}
+<div class="add-listing-container">
+  <h2><i class="fas fa-map-pin"></i> {% if land %}Edit{% else %}Add New{% endif %} Land Listing</h2>
+
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="form-grid">
+      <div class="form-section">
+        <h3>Basic Information</h3>
+        {% for field in land_form %}
+          {% if field.name in 'title,description,price,area_sqft,land_type,status' %}
+          <div class="form-group">
+            <label>{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}<span class="field-error">{{ field.errors.0 }}</span>{% endif %}
+          </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+
+      <div class="form-section">
+        <h3>Location (GPS Coordinates)</h3>
+        <p class="help-text"><i class="fas fa-info-circle"></i> Click the map below to set coordinates automatically</p>
+        {% for field in land_form %}
+          {% if field.name in 'latitude,longitude,address_text,city,state,country' %}
+          <div class="form-group">
+            <label>{{ field.label }}</label>
+            {{ field }}
+          </div>
+          {% endif %}
+        {% endfor %}
+
+        <div id="picker-map" style="height:300px;border-radius:10px;margin-top:12px;"></div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h3>Upload Photos</h3>
+      <p class="help-text">You can select multiple photos at once</p>
+      <input type="file" name="images" accept="image/*" multiple class="file-input">
+      {% if land %}
+      <div class="existing-photos">
+        {% for photo in land.photos.all %}
+          <img src="{{ photo.image.url }}" alt="{{ photo.caption }}" class="thumb">
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+
+    <button type="submit" class="btn-primary"><i class="fas fa-save"></i> Save Listing</button>
+  </form>
+</div>
+
+<!-- Google Maps Picker -->
+<script>
+function initPickerMap() {
+  var lat = parseFloat(document.getElementById('id_latitude').value) || 20.5937;
+  var lng = parseFloat(document.getElementById('id_longitude').value) || 78.9629;
+  var map = new google.maps.Map(document.getElementById('picker-map'), {
+    center: { lat: lat, lng: lng }, zoom: 5,
+    mapTypeId: 'hybrid'
+  });
+  var marker = new google.maps.Marker({ position: { lat: lat, lng: lng }, map: map, draggable: true });
+  function updateFields(latLng) {
+    document.getElementById('id_latitude').value = latLng.lat().toFixed(6);
+    document.getElementById('id_longitude').value = latLng.lng().toFixed(6);
+  }
+  map.addListener('click', function(e) {
+    marker.setPosition(e.latLng);
+    updateFields(e.latLng);
+  });
+  marker.addListener('dragend', function(e) {
+    updateFields(e.latLng);
+  });
+}
+</script>
+<script src="https://maps.googleapis.com/maps/api/js?key={{ gmaps_key }}&callback=initPickerMap" async defer></script>
+{% endblock %}

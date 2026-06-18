@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block title %}LandMarket – Find Your Perfect Land{% endblock %}
+{% block content %}
+
+<section class="hero">
+  <h1>Find Your Perfect Land</h1>
+  <p>Browse thousands of verified land listings with real GPS locations</p>
+  <div class="hero-buttons">
+    <a href="{% url 'land_list' %}" class="btn-primary">Browse Listings</a>
+    <a href="{% url 'vendor_register' %}" class="btn-secondary">Sell Your Land</a>
+  </div>
+</section>
+
+<section class="features">
+  <div class="feature-card">
+    <i class="fas fa-map-pin"></i>
+    <h3>GPS Verified Location</h3>
+    <p>Every listing shows exact location on Google Maps</p>
+  </div>
+  <div class="feature-card">
+    <i class="fas fa-camera"></i>
+    <h3>Real Photos</h3>
+    <p>Multiple photos uploaded directly by the vendor</p>
+  </div>
+  <div class="feature-card">
+    <i class="fas fa-phone"></i>
+    <h3>Direct Contact</h3>
+    <p>Contact the seller directly with one click</p>
+  </div>
+</section>
+
+<section class="listings-section">
+  <h2>Latest Listings</h2>
+  <div class="listings-grid">
+    {% for land in listings %}
+    <div class="land-card">
+      {% if land.photos.first %}
+        <img src="{{ land.photos.first.image.url }}" alt="{{ land.title }}">
+      {% else %}
+        <div class="no-img"><i class="fas fa-image"></i></div>
+      {% endif %}
+      <div class="card-body">
+        <span class="badge badge-{{ land.land_type }}">{{ land.get_land_type_display }}</span>
+        <h3>{{ land.title }}</h3>
+        <p class="location"><i class="fas fa-map-marker-alt"></i> {{ land.city }}, {{ land.state }}</p>
+        <p class="price">₹{{ land.price|floatformat:"0" }}</p>
+        <p class="area">{{ land.area_sqft }} sq.ft</p>
+        <a href="{% url 'land_detail' land.pk %}" class="btn-primary">View Details</a>
+      </div>
+    </div>
+    {% empty %}
+    <p class="empty">No listings yet. <a href="{% url 'vendor_register' %}">Be the first to list!</a></p>
+    {% endfor %}
+  </div>
+  <div style="text-align:center;margin-top:30px">
+    <a href="{% url 'land_list' %}" class="btn-secondary">View All Listings</a>
+  </div>
+</section>
+{% endblock %}
